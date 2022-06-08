@@ -3,6 +3,8 @@ docker build -t remote-dist:all -f- . < PFGElasticity/scripts/docker/remote_dist
 docker tag remote-dist:all robertovrf/remote-dist:all
 docker push robertovrf/remote-dist:all
 
+# docker - deleting images
+docker rmi $(docker images -q)
+
 
 # kubernetes
-kubectl expose deployment remote-dist --type LoadBalancer --port=8081,2010 --target-port=8081,2010
