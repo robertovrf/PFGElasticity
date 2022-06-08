@@ -20,7 +20,7 @@ spec:
         image: docker.io/robertovrf/remote-dist:all
         name: remote-dist
         ports:
-        - containerPort: 8081
+        - containerPort: 2011
         - containerPort: 2010
         imagePullPolicy: Always
         env:
