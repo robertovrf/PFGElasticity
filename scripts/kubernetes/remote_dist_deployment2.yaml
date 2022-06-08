@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: remote-dist2
+  name: remote-dist2
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: remote-dist2
+  template:
+    metadata:
+      labels:
+        run: remote-dist2
+    spec:
+      containers:
+      - command: 
+        image: docker.io/robertovrf/remote-dist:all
+        name: remote-dist2
+        ports:
+        - containerPort: 8081
+        - containerPort: 2010
+        imagePullPolicy: Always
+        env:
+          - name: POD_ID
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.uid
