@@ -4,9 +4,9 @@ metadata:
   name: remote-dist
 spec:
   ports:
-  - port: 8081
+  - port: 2011
     name: tcp1
-    targetPort: 8081
+    targetPort: 2011
   - port : 2010
     name: tcp2
     targetPort: 2010

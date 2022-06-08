@@ -36,6 +36,9 @@ const char CLEAR_LIST[]   = "clearList"
 
 /* IPs */
 const char LOCALHOST[] = "localhost"
+const char IP1[] = "34.133.206.64"
+const char IP2[] = "104.154.100.135"
+
 
 component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEncoder parser,
 	net.TCPSocket, data.StringUtil strUtil, io.Output out, data.IntUtil iu,
@@ -48,11 +51,11 @@ component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEnc
 		if (remoteDistsIps == null) {
 			remoteDistsIps = new IPAddr[2]
 			remoteDistsIps[0] = new IPAddr()
-			remoteDistsIps[0].ip = new char[](LOCALHOST)
-			remoteDistsIps[0].port = 8081
+			remoteDistsIps[0].ip = new char[](IP1)
+			remoteDistsIps[0].port = 2011
 			remoteDistsIps[1] = new IPAddr()
-			remoteDistsIps[1].ip = new char[](LOCALHOST)
-			remoteDistsIps[1].port = 8082
+			remoteDistsIps[1].ip = new char[](IP2)
+			remoteDistsIps[1].port = 2011
 		}
 	}
 
@@ -60,11 +63,11 @@ component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEnc
 		if (remoteListsIps == null) {
 			remoteListsIps = new IPAddr[2]
 			remoteListsIps[0] = new IPAddr()
-			remoteListsIps[0].ip = new char[](LOCALHOST)
+			remoteListsIps[0].ip = new char[](IP1)
 			remoteListsIps[0].port = 2010
 			remoteListsIps[1] = new IPAddr()
-			remoteListsIps[1].ip = new char[](LOCALHOST)
-			remoteListsIps[1].port = 2011
+			remoteListsIps[1].ip = new char[](IP2)
+			remoteListsIps[1].port = 2010
 		}
 	}
 
