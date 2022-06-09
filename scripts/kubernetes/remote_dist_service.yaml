@@ -10,4 +10,6 @@ spec:
   - port : 2010
     name: serverapp
     targetPort: 2010
+  selector:
+    app: remote-dist2
   type: LoadBalancer

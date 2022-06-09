@@ -29,3 +29,19 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: metadata.uid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: remote-dist
+spec:
+  ports:
+  - port: 2011
+    name: rdist
+    targetPort: 2011
+  - port : 2010
+    name: serverapp
+    targetPort: 2010
+  selector:
+    app: remote-dist
+  type: LoadBalancer
