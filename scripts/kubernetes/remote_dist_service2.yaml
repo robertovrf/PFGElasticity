@@ -5,9 +5,9 @@ metadata:
 spec:
   ports:
   - port: 2011
-    name: tcp1
+    name: rdist
     targetPort: 2011
   - port : 2010
-    name: tcp2
+    name: serverapp
     targetPort: 2010
   type: LoadBalancer

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: remote-dist
+  name: remote-dist2
 spec:
   ports:
   - port: 2011
-    name: tcp1
+    name: rdist
     targetPort: 2011
   - port : 2010
-    name: tcp2
+    name: serverapp
     targetPort: 2010
   type: LoadBalancer
