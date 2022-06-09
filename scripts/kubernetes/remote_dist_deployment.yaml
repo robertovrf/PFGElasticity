@@ -39,9 +39,6 @@ spec:
   - port: 2011
     name: rdist
     targetPort: 2011
-  - port : 2010
-    name: serverapp
-    targetPort: 2010
   selector:
     app: remote-dist
   type: LoadBalancer
