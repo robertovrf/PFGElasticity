@@ -1,31 +1,32 @@
 component provides App requires io.Output out, net.http.HTTPRequest http {
-	char server[] = "localhost"
-
+	//char server[] = "localhost:8080"
+	char server[] = "35.223.254.129:5000"
+	
 	int App:main(AppParam params[]) {
 		
 
-		HTTPResponse resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("1"))
+		HTTPResponse resp = http.post(new char[]("http://", server, "/add"), null, new char[]("1"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("2"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("2"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("3"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("3"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("4"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("4"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("5"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("5"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("6"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("6"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("7"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("7"))
 		out.println("$(resp.content)")
 		
-		resp = http.post(new char[]("http://", server, ":8080/add"), null, new char[]("8"))
+		resp = http.post(new char[]("http://", server, "/add"), null, new char[]("8"))
 		out.println("$(resp.content)")
 
 		

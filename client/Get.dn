@@ -1,8 +1,9 @@
 component provides App requires io.Output out, net.http.HTTPRequest http {
-	char server[] = "localhost"
+	//char server[] = "localhost:8080"
+	char server[] = "35.223.254.129:5000"
 
 	int App:main(AppParam params[]) {
-		HTTPResponse resp = http.get(new char[]("http://", server, ":8080/get"), null)
+		HTTPResponse resp = http.get(new char[]("http://", server, "/get"), null)
 		out.println("$(resp.content)")
 		return 0
 	}
