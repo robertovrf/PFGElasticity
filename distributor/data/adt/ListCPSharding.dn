@@ -36,8 +36,8 @@ const char CLEAR_LIST[]   = "clearList"
 
 /* IPs */
 const char LOCALHOST[] = "localhost"
-const char IP1[] = "35.192.177.242"
-const char IP2[] = "34.121.208.131"
+const char IP1[] = "35.224.140.81"
+const char IP2[] = "34.134.88.247"
 
 component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEncoder parser,
 	net.TCPSocket, data.StringUtil strUtil, io.Output out, data.IntUtil iu,

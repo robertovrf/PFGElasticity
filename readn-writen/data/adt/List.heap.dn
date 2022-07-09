@@ -129,10 +129,10 @@ component provides List:heap(Destructor, AdaptEvents) requires io.Output out, da
             for (int i = 0; i < length; i++) {
                 items[i] = sortedHeapCopy[i]
             }
-            if (items != null) {
-                Data item[] = new Data[](items[0])
-                return item
-            }
+            //if (items != null) {
+            //    Data item[] = new Data[](items[0])
+            //    return item
+            //}
             return items
         }
     }
