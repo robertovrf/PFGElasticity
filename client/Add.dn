@@ -1,6 +1,6 @@
 component provides App requires io.Output out, net.http.HTTPRequest http {
 	//char server[] = "localhost:8080"
-	char server[] = "35.192.177.242:5000"
+	char server[] = "34.71.140.48:5000"
 	
 	int App:main(AppParam params[]) {
 		

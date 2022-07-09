@@ -6,6 +6,8 @@ docker push robertovrf/remote-dist:all
 # docker - deleting images
 docker rmi $(docker images -q)
 
-
 # kubernetes
 kubectl expose deployment distributor --type LoadBalancer --port 5000 --target-port 5000
+
+# Running distributor
+dana -sp "../server;../readn-writen" Distributor.o
