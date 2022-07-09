@@ -1,12 +1,22 @@
-component provides App requires io.Output out, net.http.HTTPRequest http, data.IntUtil iu {
+component provides App requires io.Output out, net.http.HTTPRequest http, data.IntUtil iu, 
+    time.DateUtil dateUtil, time.Calendar ic {
 	char server[] = "localhost:8080"
 	//char server[] = "34.71.140.48:5000"
 	
 	int App:main(AppParam params[]) {
 		HTTPResponse resp
         for (int i = 0; i < 1000; i++) {
+            DateTime dt1
+            DateTime dt2
+            dt1 = ic.getTime()
             resp = http.post(new char[]("http://", server, "/add"), null, new char[](iu.intToString(i+1)))
-	    	out.println("$(resp.content)")  
+	    	//out.println("$(resp.content)")
+            dt2 = ic.getTime()
+            int mili
+            if ((dt1 != null) && (dt2 != null)) {
+                mili = dateUtil.toMilliseconds(dateUtil.diff(dt1, dt2))
+            }
+            out.println("$(iu.intToString(mili))")
         }
 		return 0
 	}
