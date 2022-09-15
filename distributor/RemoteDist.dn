@@ -31,6 +31,7 @@ component provides App requires io.Output out, net.TCPSocket, net.TCPServerSocke
 			out.println("$(debugMSG) Remote Component $(remoteP) Started! ")
 			running = true
 			remote = assembly.getCompsByProvidedInterface("proxy.DistProxy")
+			out.println("Current config: $(assembly.getConfig())")
 		}
 		if ((remote == null) || (remote.arrayLength > 1)) { throw new Exception("Something went wrong!") }
 		else {
