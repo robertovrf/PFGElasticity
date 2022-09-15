@@ -37,13 +37,13 @@ component provides List:heap(Destructor, AdaptEvents) requires io.Output out, da
                 idx = parentIdx
                 parentIdx = (idx - 1) / 2
             }
-            out.println("I'm write  [$(iu.intToString(heap.arrayLength))]")
-            /*char result[] = new char[]("[")
+            char result[] = new char[]("[")
             for (int i = 0; i < length; i++) {
                 result = new char[](result, " ", iu.intToString(heap[i].key))
             }
             result = new char[](result, " ]")
-            out.println("$(result)")*/
+            out.println("I'm write  [$(iu.intToString(heap.arrayLength))]")
+            //out.println("$(result)")
         }
     }
 
