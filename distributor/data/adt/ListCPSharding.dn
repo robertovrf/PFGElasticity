@@ -139,7 +139,7 @@ component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEnc
 		Int num = item
 		IPAddr addr = remoteListsIps[hash.h(num.i, remoteListsIps.arrayLength)]
 		// send to remote list
-		makeRequest(addr, content2, false)
+		makeRequest(addr, content2, true)
 	}
 
 	void List:remove(Data item) {
