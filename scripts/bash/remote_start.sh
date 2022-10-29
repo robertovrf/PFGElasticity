@@ -1,2 +1,2 @@
 #!/bin/bash
-dana -sp ../writen RemoteDist.o > remote.log
+dana -sp ../readn-writen RemoteDist.o > remote.log
