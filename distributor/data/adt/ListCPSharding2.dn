@@ -239,7 +239,7 @@ component provides List:heap(Destructor, AdaptEvents) requires data.json.JSONEnc
 
 	// this is extremely hardcoded! ):
 	void AdaptEvents:active() {
-		out.println("Sharding 1 connected")
+        out.println("Sharding 2 connected")
 		if (content != null) {
 			setupRemoteDistsIPs()
 			ShardState shardState[] = new ShardState[remoteDistsIps.arrayLength]

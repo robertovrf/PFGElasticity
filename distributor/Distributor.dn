@@ -1,24 +1,90 @@
 const char debugMSG[]	  = "[@Distributor]"
 
+/* commands */
 const char HELP[]       = "help"
 const char ALTERNATE[]  = "alternate"
 const char PROPAGATE[]  = "propagate"
 const char SHARDING[]   = "sharding"
+const char SHARDING2[]  = "sharding2"
 const char LOCAL[]      = "local"
-const char PERCEPTION[] = "perception"
-const char TEST[]		= "test"
-const char TEST2[]		= "test2"
-const char TEST3[]		= "test3"
-const char TEST4[]		= "test4"
 const char EXIT[]       = "exit"
 
+/* HTTP responses */
+const char OK_STATUS[] 			= "200 OK"
+const char BADREQUEST_STATUS[] 	= "400 Bad Request"
+const char NOTFOUND_STATUS[] 	= "404 Not Found"
+
+/* emergent sys port */
+const int PORT = 2002
+
 component provides App requires io.Output out, data.StringUtil strUtil, data.IntUtil iu, io.Input in, 
-	monitoring.Perception, data.json.JSONEncoder encoder, data.DecUtil du, time.Timer t {
+	monitoring.Perception, data.json.JSONEncoder encoder, data.DecUtil du, time.Timer t, 
+	http.util.HTTPUtil httpUtil, data.json.JSONParser parser, net.TCPSocket, net.TCPServerSocket {
 
 	String remoteConfigs[] 		= null
 	String localConfigs[] 		= null
 	String distributedProxies[] = null
 	Perception perception 		= null
+
+	HTTPMessage readRequest(TCPSocket client) {
+		HTTPMessage msg = clone httpUtil.readHTTPRequest(client)
+		/* removes the htdocs path + /meta/ */
+		int start = HTTPUtil.htdocs.arrayLength + 6 // 6 = {/meta/}.arrayLength
+		if (msg.resource.arrayLength > start) {
+			int length = msg.resource.arrayLength - start
+			msg.resource = strUtil.subString(msg.resource, start, length)	
+		}
+		return msg
+	}
+
+	char[] parseCommand(HTTPMessage msg) {
+		char result[] = ""
+		if (msg.command == "GET") {
+			result = msg.resource
+		} else if (msg.command == "POST") {
+			// to do...
+		}
+		return result
+	}
+
+	void sendResponse(TCPSocket client, char msg[]) {
+		client.send(msg)
+		client.disconnect()
+	}
+
+	char[] formatHTTPResponse(String response[]) {
+		char resp[] = null
+		if (response.arrayLength > 0) {	resp = new char[]("HTTP/1.0 ", response[0].string, " \r\n")	}
+		else { resp = new char[]("HTTP/1.0 ", BADREQUEST_STATUS, " \r\n") }
+		resp = new char[] (resp, "Server: EmergentSys v1\r\n", "Content-Encoding: binary\r\n")	
+		if (response.arrayLength > 1) {
+			resp = new char[](resp, "Content-Length: $(iu.intToString(response[1].string.arrayLength))\r\n")	
+		} else { resp = new char[](resp, "Content-Length: $(iu.intToString(0))\r\n") }
+		resp = new char[](resp, "Content-Type: text/json\r\n", "Access-Control-Allow-Origin: *\r\n","\r\n")
+		if (response.arrayLength > 1) { resp = new char[](resp, response[1].string) }
+		return resp
+	}
+
+	String[] execCommand(char command[]) {
+		if ((command == null) || (command == "")) {	return new String[](new String(BADREQUEST_STATUS)) }
+		return commandInterpret(command)
+	}
+
+	void executor(TCPSocket client) {
+		sendResponse(client, formatHTTPResponse(execCommand(parseCommand(readRequest(client)))))
+	}
+
+	void serverStart() {
+		TCPServerSocket host = new TCPServerSocket()
+		if (!host.bind(TCPServerSocket.ANY_ADDRESS, PORT)) {
+			out.println("Error: failed to bind master socket")
+			return
+		}
+		while (true) {
+			TCPSocket client = new TCPSocket()
+			if (client.accept(host)) { asynch::executor(client)	}
+		}
+	}
 
 	void help() {
 		out.println("Command list:")
@@ -26,8 +92,8 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 		out.println(" $(ALTERNATE) - to distribute list alternating requests between replicas")
 		out.println(" $(PROPAGATE) - to distribute list propagating write requests to all replicas")
 		out.println(" $(SHARDING) - to distribute list with sharding")
+		out.println(" $(SHARDING2) - to distribute list with sharding2")
 		out.println(" $(LOCAL) - to bring list locally")
-		out.println(" $(PERCEPTION) - to get perception data from the current running composition")
 		out.println(" $(EXIT) - to finish execution")
 	}
 
@@ -46,43 +112,7 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 		}
 	}
 
-	void perception() {
-		//char jsonPD[] = perception.getPerceptionData()
-		//out.println("$(debugMSG) $(jsonPD)")
-		PerceptionData pD[] = encoder.jsonToArray(perception.getPerceptionData(), typeof(PerceptionData[]), null)
-		for (int i = 0; i < pD.arrayLength; i++) {
-			for (int cMetrics = 0; cMetrics < pD[i].metrics.arrayLength; cMetrics++) {
-				dec value = pD[i].metrics[cMetrics].value
-				dec counter = pD[i].metrics[cMetrics].counter
-				dec avgRT = value/counter
-				out.println("$(debugMSG) Avg response time: $(du.decToString(avgRT))")
-			}
-			for (int cEvents = 0; cEvents < pD[i].events.arrayLength; cEvents++) {
-				out.println("$(debugMSG) Request type: $(pD[i].events[cEvents].type) - $(pD[i].events[cEvents].counter) ")
-			}
-		}
-	}
-
-	dec getAvgResponseTime() {
-		PerceptionData pD[] = encoder.jsonToArray(perception.getPerceptionData(), typeof(PerceptionData[]), null)
-		dec result = 0.0
-		if ((pD != null) && (pD[0].metrics.arrayLength > 0)) {
-			dec value = pD[0].metrics[0].value
-			dec counter = pD[0].metrics[0].value
-			result = value/counter
-		}
-		return result
-	}
-
-	void observationLoop(int numCycles, int observationWindow) {
-		getAvgResponseTime()
-		for (int i = 0; i < numCycles; i++) {
-			t.sleep(observationWindow)
-			out.println("$(debugMSG) $(du.decToString(getAvgResponseTime()))")
-		}
-	}
-
-	void commandInterpret(char cmd[]) {
+	String[] commandInterpret(char cmd[]) {
 		String cmdList[] = strUtil.explode(cmd, " ")
 		if (cmdList.arrayLength == 1) {
 			if (cmd == HELP) {
@@ -93,47 +123,16 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 				distribute("ListCPAlternate.o")
 			} else if (cmd == SHARDING) {
 				distribute("ListCPSharding.o")
+			} else if (cmd == SHARDING2) {
+				distribute("ListCPSharding2.o")
 			} else if (cmd == LOCAL) {
 				local()
-			} else if (cmd == PERCEPTION) {
-				perception()
-			} else if (cmd == TEST) {
-				out.println("$(debugMSG) Starting test...")
-				local()
-				observationLoop(10, 1000)
-				distribute("ListCPPropagate.o")
-				observationLoop(10, 1000)
-				distribute("ListCPAlternate.o")
-				observationLoop(10, 1000)
-				distribute("ListCPSharding.o")
-				observationLoop(10, 1000)
-				out.println("$(debugMSG) Test finished!")
-			} else if (cmd == TEST2) { 
-				out.println("$(debugMSG) Starting tests...")
-				t.sleep(10000)
-				distribute("ListCPPropagate.o")
-				t.sleep(10000)
-				local()
-				t.sleep(10000)
-				out.println("$(debugMSG) End tests...")
-			} else if (cmd == TEST3) {
-				out.println("$(debugMSG) Starting tests...")
-				local()
-				t.sleep(10000)
-				t.sleep(10000)
-				t.sleep(10000)
-				out.println("$(debugMSG) End tests...")
-			} else if (cmd == TEST4) {
-				local()
-				t.sleep(90000)
-				distribute("ListCPPropagate.o")
-				t.sleep(180000)
-				local()
-				t.sleep(90000)
 			} else {
 				out.println("Invalid command.")
+				return new String[](new String(BADREQUEST_STATUS))
 			}
 		}
+		return new String[](new String(OK_STATUS))
 	}
 
 	char[] getRemoteConfig(char proxy[]) {
@@ -174,7 +173,8 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 			distributedProxies = new String[](
 				new String("ListCPPropagate.o"),
 				new String("ListCPAlternate.o"),
-				new String("ListCPSharding.o"))
+				new String("ListCPSharding.o"),
+				new String("ListCPSharding2.o"))
 		}
 	}
 
@@ -182,7 +182,7 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 		perception = new Perception(true)
 		/* Loading target system and adding a monitoring proxy to it */
 		perception.setMain("../server/main.o", null)
-		perception.addProxy("|../distributor/monitoring/proxies/ServerProxy.o|*(*:server.Server[0]:*)|")
+		//perception.addProxy("|../distributor/monitoring/proxies/ServerProxy.o|*(*:server.Server[0]:*)|")
 		String configs[] = perception.getAllConfigs()
 		for (int i = 0; i < configs.arrayLength; i++) {
 			out.println("$(debugMSG) $(iu.intToString(i+1)): $(configs[i].string)")
@@ -190,6 +190,7 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 		loadDistributedProxies()
 		remoteLocalSeparation()
 		local()
+		asynch::serverStart()
 		/* command prompt */
 		char cmd[] = "start"
 		while (cmd != "exit") {
