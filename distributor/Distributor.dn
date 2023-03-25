@@ -7,6 +7,7 @@ const char PROPAGATE[]  = "propagate"
 const char SHARDING[]   = "sharding"
 const char SHARDING2[]  = "sharding2"
 const char LOCAL[]      = "local"
+const char RELOCATE[]   = "relocate"
 const char EXIT[]       = "exit"
 
 /* HTTP responses */
@@ -94,6 +95,7 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 		out.println(" $(SHARDING) - to distribute list with sharding")
 		out.println(" $(SHARDING2) - to distribute list with sharding2")
 		out.println(" $(LOCAL) - to bring list locally")
+		out.println(" $(RELOCATE) - to distribute the list to another node")
 		out.println(" $(EXIT) - to finish execution")
 	}
 
@@ -103,8 +105,10 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 	}
 
 	void distribute(char proxyInterface[]) {
+		out.println("here 2")
 		char remoteConfig[] = getRemoteConfig("data/adt/$(proxyInterface)")
-		if (remoteConfig != null) {	
+		if (remoteConfig != null) {
+			out.println("here 3")
 			perception.setConfig(remoteConfig)
 			out.println("$(debugMSG) Remote composition [($proxyInterface)] running.")	
 		} else {
@@ -125,6 +129,9 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 				distribute("ListCPSharding.o")
 			} else if (cmd == SHARDING2) {
 				distribute("ListCPSharding2.o")
+			} else if (cmd == RELOCATE) {
+				out.println("here 1")
+				distribute("Relocate.o")
 			} else if (cmd == LOCAL) {
 				local()
 			} else {
@@ -174,7 +181,8 @@ component provides App requires io.Output out, data.StringUtil strUtil, data.Int
 				new String("ListCPPropagate.o"),
 				new String("ListCPAlternate.o"),
 				new String("ListCPSharding.o"),
-				new String("ListCPSharding2.o"))
+				new String("ListCPSharding2.o"),
+				new String("Relocate.o"))
 		}
 	}
 
